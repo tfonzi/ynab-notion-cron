@@ -1,0 +1,23 @@
+{
+  "name": "lambda-function",
+  "version": "1.0.0",
+  "description": "Lambda function with YNAB and Notion integration",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "zip": "cd dist && zip -r ../terraform/lambda.zip .",
+    "dev": "ts-node -r dotenv/config scripts/local.ts"
+  },
+  "dependencies": {
+    "ynab": "^1.50.0",
+    "@notionhq/client": "^2.2.14"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.133",
+    "@types/node": "^20.11.24",
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2",
+    "dotenv": "^16.4.5"
+  }
+} 

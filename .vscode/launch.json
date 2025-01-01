@@ -1,0 +1,24 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug Lambda Local",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/scripts/local.ts",
+            "runtimeArgs": [
+                "-r",
+                "ts-node/register",
+                "-r",
+                "dotenv/config"
+            ],
+            "console": "integratedTerminal",
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ]
+        }
+    ]
+} 
