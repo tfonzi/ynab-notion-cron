@@ -133,6 +133,7 @@ data "aws_iam_policy_document" "github_actions_policy" {
       "s3:PutBucketPublicAccessBlock",
       "s3:GetBucketOwnershipControls",
       "s3:PutBucketOwnershipControls",
+      "s3:GetAccelerateConfiguration",
       "s3:PutObject",
       "s3:GetObject",
       "s3:DeleteObject",
