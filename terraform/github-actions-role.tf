@@ -31,7 +31,8 @@ data "aws_iam_policy_document" "github_actions_policy" {
       "lambda:PublishVersion",
       "lambda:CreateAlias",
       "lambda:DeleteAlias",
-      "lambda:UpdateAlias"
+      "lambda:UpdateAlias",
+      "lambda:GetFunctionCodeSigningConfig"
     ]
     resources = [aws_lambda_function.ynab_notion_cron.arn]
   }
