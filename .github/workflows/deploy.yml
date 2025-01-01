@@ -43,9 +43,6 @@ jobs:
       - name: Build TypeScript
         run: npm run build
 
-      - name: Create Lambda zip
-        run: npm run zip
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
