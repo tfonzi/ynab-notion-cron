@@ -68,12 +68,19 @@ data "aws_iam_policy_document" "github_actions_policy" {
     ]
   }
 
-  # CloudWatch Logs permissions for Lambda
+  # CloudWatch Logs permissions for listing log groups (account level)
+  statement {
+    actions = [
+      "logs:DescribeLogGroups"
+    ]
+    resources = ["*"]
+  }
+
+  # CloudWatch Logs permissions for specific log group
   statement {
     actions = [
       "logs:CreateLogGroup",
       "logs:DeleteLogGroup",
-      "logs:DescribeLogGroups",
       "logs:ListTagsLogGroup",
       "logs:PutRetentionPolicy"
     ]
