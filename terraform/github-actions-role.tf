@@ -81,7 +81,7 @@ data "aws_iam_policy_document" "github_actions_policy" {
     actions = [
       "logs:CreateLogGroup",
       "logs:DeleteLogGroup",
-      "logs:ListTagsLogGroup",
+      "logs:ListTagsForResource",
       "logs:PutRetentionPolicy"
     ]
     resources = [
