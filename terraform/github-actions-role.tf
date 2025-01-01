@@ -45,11 +45,26 @@ data "aws_iam_policy_document" "github_actions_policy" {
       "iam:PutRolePolicy",
       "iam:DeleteRolePolicy",
       "iam:GetRolePolicy",
+      "iam:ListRolePolicies",
       "iam:AttachRolePolicy",
       "iam:DetachRolePolicy",
-      "iam:ListAttachedRolePolicies"
+      "iam:ListAttachedRolePolicies",
+      "iam:GetOpenIDConnectProvider"
     ]
-    resources = ["*"]
+    resources = [
+      aws_iam_role.github_actions.arn,
+      aws_iam_role.lambda_role.arn
+    ]
+  }
+
+  # Additional statement for OIDC provider access
+  statement {
+    actions = [
+      "iam:GetOpenIDConnectProvider"
+    ]
+    resources = [
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"
+    ]
   }
 
   # S3 permissions for Terraform state (if using S3 backend)
