@@ -1,8 +1,8 @@
-// Add your custom types here
-export interface YNABTransaction {
-    // Define your YNAB transaction interface
-}
 
-export interface NotionPage {
-    // Define your Notion page interface
+
+export interface CategoryData {
+    name: string;
+    budgeted: number;
+    balance: number;
+    activity: number;
 } 

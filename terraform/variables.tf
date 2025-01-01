@@ -4,12 +4,6 @@ variable "ynab_access_token" {
   sensitive   = true
 }
 
-variable "notion_api_key" {
-  description = "Notion API key"
-  type        = string
-  sensitive   = true
-}
-
 variable "github_repository" {
   description = "The GitHub repository in format owner/repo-name"
   type        = string

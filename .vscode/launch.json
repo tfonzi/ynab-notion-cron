@@ -15,9 +15,14 @@
                 "-r",
                 "dotenv/config"
             ],
+            "sourceMaps": true,
             "console": "integratedTerminal",
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
+            ],
+            "resolveSourceMapLocations": [
+                "${workspaceFolder}/**/*.ts",
+                "${workspaceFolder}/**/*.js"
             ]
         }
     ]

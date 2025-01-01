@@ -42,7 +42,7 @@ resource "aws_lambda_function" "ynab_notion_cron" {
   environment {
     variables = {
       YNAB_ACCESS_TOKEN = var.ynab_access_token
-      NOTION_API_KEY    = var.notion_api_key
+      AWS_REGION        = var.aws_region
     }
   }
 }
@@ -51,4 +51,29 @@ resource "aws_lambda_function" "ynab_notion_cron" {
 resource "aws_cloudwatch_log_group" "lambda_logs" {
   name              = "/aws/lambda/${aws_lambda_function.ynab_notion_cron.function_name}"
   retention_in_days = 14
+}
+
+# S3 access policy for Lambda
+resource "aws_iam_role_policy" "lambda_s3_policy" {
+  name = "lambda_s3_policy"
+  role = aws_iam_role.lambda_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:GetObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          aws_s3_bucket.category_visualizations.arn,
+          "${aws_s3_bucket.category_visualizations.arn}/*"
+        ]
+      }
+    ]
+  })
 } 

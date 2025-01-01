@@ -4,14 +4,16 @@
   "description": "Lambda function with YNAB and Notion integration",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --sourceMap",
     "watch": "tsc -w",
     "zip": "cd dist && zip -r ../terraform/lambda.zip .",
-    "dev": "ts-node -r dotenv/config scripts/local.ts"
+    "dev": "ts-node -r dotenv/config scripts/local.ts",
+    "debug": "ts-node --inspect -r dotenv/config scripts/local.ts"
   },
   "dependencies": {
-    "ynab": "^1.50.0",
-    "@notionhq/client": "^2.2.14"
+    "aws-lambda": "^1.0.7",
+    "aws-sdk": "^2.1502.0",
+    "ynab": "^1.50.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.133",

@@ -1,26 +1,13 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import * as ynab from 'ynab';
-import { Client } from '@notionhq/client';
+import { CategoryData } from './types';
+import { uploadCategoryVisualizations } from './htmlGenerator';
 
 // Initialize clients
 const ynabAPI = new ynab.API(process.env.YNAB_ACCESS_TOKEN || '');
-const notion = new Client({ auth: process.env.NOTION_API_KEY || '' });
 
 // Constants
 const BUDGET_ID = process.env.YNAB_BUDGET_ID || '';
-const NOTION_PAGE_ID = process.env.NOTION_PAGE_ID || '';
-
-interface CategoryData {
-    name: string;
-    budgeted: number;
-    balance: number;
-    activity: number;
-}
-
-const createRichText = (text: string) => ({
-    type: 'text' as const,
-    text: { content: text }
-});
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     try {
@@ -39,64 +26,13 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
         // Extract relevant data from categories
         const categoryData: CategoryData[] = foodGroup.categories.map(category => ({
             name: category.name,
-            budgeted: category.budgeted / 1000, // YNAB stores amounts in milliunits
+            budgeted: category.budgeted / 1000,
             balance: category.balance / 1000,
             activity: category.activity / 1000
         }));
 
-        // Update Notion page
-        await notion.pages.update({
-            page_id: NOTION_PAGE_ID,
-            properties: {
-                'Last Updated': {
-                    date: {
-                        start: new Date().toISOString(),
-                    },
-                },
-            },
-        });
-
-        // Create or update the table in Notion
-        const blocks = await notion.blocks.children.append({
-            block_id: NOTION_PAGE_ID,
-            children: [
-                {
-                    object: 'block' as const,
-                    type: 'table' as const,
-                    table: {
-                        table_width: 4,
-                        has_column_header: true,
-                        has_row_header: false,
-                        children: [
-                            {
-                                object: 'block' as const,
-                                type: 'table_row' as const,
-                                table_row: {
-                                    cells: [
-                                        [createRichText('Category')],
-                                        [createRichText('Budgeted')],
-                                        [createRichText('Balance')],
-                                        [createRichText('Activity')]
-                                    ]
-                                }
-                            },
-                            ...categoryData.map(category => ({
-                                object: 'block' as const,
-                                type: 'table_row' as const,
-                                table_row: {
-                                    cells: [
-                                        [createRichText(category.name)],
-                                        [createRichText(`$${category.budgeted.toFixed(2)}`)],
-                                        [createRichText(`$${category.balance.toFixed(2)}`)],
-                                        [createRichText(`$${category.activity.toFixed(2)}`)]
-                                    ]
-                                }
-                            }))
-                        ]
-                    }
-                }
-            ]
-        });
+        // Generate and upload HTML visualizations
+        await uploadCategoryVisualizations(categoryData);
 
         return {
             statusCode: 200,
@@ -106,7 +42,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
             body: JSON.stringify({
                 message: 'Success',
                 categoryData,
-                notionUpdate: blocks
+                visualizationBaseUrl: `http://ynab-notion-category-visualizations.s3-website-${process.env.AWS_REGION}.amazonaws.com/`
             }),
         };
     } catch (error) {
