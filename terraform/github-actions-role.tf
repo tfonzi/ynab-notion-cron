@@ -113,6 +113,24 @@ data "aws_iam_policy_document" "github_actions_policy" {
     ]
     resources = [var.terraform_state_lock_table_arn]
   }
+
+  # S3 permissions
+  statement {
+    actions = [
+      "s3:CreateBucket",
+      "s3:DeleteBucket",
+      "s3:PutBucketPolicy",
+      "s3:GetBucketPolicy",
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      aws_s3_bucket.category_visualizations.arn,
+      "${aws_s3_bucket.category_visualizations.arn}/*"
+    ]
+  }
 }
 
 resource "aws_iam_role_policy" "github_actions" {

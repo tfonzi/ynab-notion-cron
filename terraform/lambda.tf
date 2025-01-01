@@ -42,7 +42,6 @@ resource "aws_lambda_function" "ynab_notion_cron" {
   environment {
     variables = {
       YNAB_ACCESS_TOKEN = var.ynab_access_token
-      AWS_REGION        = var.aws_region
     }
   }
 }

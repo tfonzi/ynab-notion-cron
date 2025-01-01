@@ -18,9 +18,3 @@ variable "terraform_state_lock_table_arn" {
   description = "The ARN of the DynamoDB table used for Terraform state locking"
   type        = string
 }
-
-variable "aws_region" {
-  description = "The AWS region for the resources"
-  type        = string
-  default     = "us-east-1"
-}
