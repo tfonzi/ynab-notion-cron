@@ -30,11 +30,11 @@ data "archive_file" "lambda_zip" {
 }
 
 # Lambda function
-resource "aws_lambda_function" "example" {
+resource "aws_lambda_function" "ynab_notion_cron" {
   filename         = data.archive_file.lambda_zip.output_path
-  function_name    = "example_lambda_function"
-  role            = aws_iam_role.lambda_role.arn
-  handler         = "index.handler"
+  function_name    = "ynab_notion_cron"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "index.handler"
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 
   runtime = "nodejs18.x"
@@ -49,6 +49,6 @@ resource "aws_lambda_function" "example" {
 
 # CloudWatch Log Group for Lambda logs
 resource "aws_cloudwatch_log_group" "lambda_logs" {
-  name              = "/aws/lambda/${aws_lambda_function.example.function_name}"
+  name              = "/aws/lambda/${aws_lambda_function.ynab_notion_cron.function_name}"
   retention_in_days = 14
 } 
