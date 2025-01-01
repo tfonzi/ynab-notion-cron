@@ -4,9 +4,8 @@
   "description": "Lambda function with YNAB and Notion integration",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc --sourceMap",
+    "build": "tsc --sourceMap && cd dist && cp -r ../node_modules .",
     "watch": "tsc -w",
-    "zip": "cd dist && cp -r ../node_modules . && zip -r ../terraform/lambda.zip . && rm -rf node_modules",
     "dev": "ts-node -r dotenv/config scripts/local.ts",
     "debug": "ts-node --inspect -r dotenv/config scripts/local.ts"
   },

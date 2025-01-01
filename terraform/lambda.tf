@@ -25,8 +25,9 @@ resource "aws_iam_role_policy_attachment" "lambda_basic" {
 # Archive file containing Lambda function code
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_file = "${path.module}/../dist/index.js"
+  source_dir  = "${path.module}/../dist"
   output_path = "${path.module}/lambda.zip"
+  excludes    = ["*.map"] # Exclude source maps
 }
 
 # Lambda function
