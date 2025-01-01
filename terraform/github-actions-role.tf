@@ -68,6 +68,21 @@ data "aws_iam_policy_document" "github_actions_policy" {
     ]
   }
 
+  # CloudWatch Logs permissions for Lambda
+  statement {
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:DeleteLogGroup",
+      "logs:DescribeLogGroups",
+      "logs:ListTagsLogGroup",
+      "logs:PutRetentionPolicy"
+    ]
+    resources = [
+      aws_cloudwatch_log_group.lambda_logs.arn,
+      "${aws_cloudwatch_log_group.lambda_logs.arn}:*"
+    ]
+  }
+
   # S3 permissions for Terraform state (if using S3 backend)
   statement {
     actions = [
