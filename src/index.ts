@@ -48,7 +48,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
         // Generate and upload HTML visualizations
         console.log('Starting visualization generation and upload');
-        uploadCategoryVisualizations(categoryData);
+        await uploadCategoryVisualizations(categoryData);
         console.log('Successfully uploaded visualizations');
 
         const response = {
