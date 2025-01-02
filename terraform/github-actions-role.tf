@@ -50,6 +50,10 @@ data "aws_iam_policy_document" "github_actions_policy" {
       "iam:AttachRolePolicy",
       "iam:DetachRolePolicy",
       "iam:ListAttachedRolePolicies",
+      "iam:ListInstanceProfilesForRole",
+      "iam:GetInstanceProfile",
+      "iam:RemoveRoleFromInstanceProfile",
+      "iam:DeleteInstanceProfile",
       "iam:GetOpenIDConnectProvider"
     ]
     resources = [

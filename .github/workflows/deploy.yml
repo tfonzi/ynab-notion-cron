@@ -17,7 +17,6 @@ jobs:
       AWS_ROLE_ARN: "arn:aws:iam::611260057175:role/github-actions-role"
       # Terraform variables mapping
       TF_VAR_ynab_access_token: ${{ secrets.TF_VAR_YNAB_ACCESS_TOKEN }}
-      TF_VAR_notion_api_key: ${{ secrets.TF_VAR_NOTION_API_KEY }}
       TF_VAR_github_repository: ${{ github.repository }}
       TF_VAR_aws_region: us-east-1
       TF_VAR_terraform_state_bucket: ynab-notion-cron-bucket
