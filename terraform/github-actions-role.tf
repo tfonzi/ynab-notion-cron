@@ -140,6 +140,18 @@ data "aws_iam_policy_document" "github_actions_policy" {
       "${aws_s3_bucket.category_visualizations.arn}/*"
     ]
   }
+
+  # EventBridge permissions
+  statement {
+    actions = [
+      "events:PutRule",
+      "events:DeleteRule",
+      "events:PutTargets",
+      "events:RemoveTargets",
+      "events:DescribeRule"
+    ]
+    resources = [aws_cloudwatch_event_rule.lambda_schedule.arn]
+  }
 }
 
 resource "aws_iam_role_policy" "github_actions" {

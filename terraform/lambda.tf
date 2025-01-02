@@ -78,4 +78,27 @@ resource "aws_iam_role_policy" "lambda_s3_policy" {
       }
     ]
   })
+}
+
+# EventBridge rule for scheduled Lambda execution
+resource "aws_cloudwatch_event_rule" "lambda_schedule" {
+  name                = "ynab_notion_cron_schedule"
+  description         = "Trigger Lambda function every 6 hours starting at 6am"
+  schedule_expression = "cron(0 6/6 * * ? *)" # Run at 6am, 12pm, 6pm, 12am UTC
+}
+
+# EventBridge target to point to the Lambda function
+resource "aws_cloudwatch_event_target" "lambda_target" {
+  rule      = aws_cloudwatch_event_rule.lambda_schedule.name
+  target_id = "YnabNotionCronLambda"
+  arn       = aws_lambda_function.ynab_notion_cron.arn
+}
+
+# Lambda permission to allow EventBridge to invoke the function
+resource "aws_lambda_permission" "allow_eventbridge" {
+  statement_id  = "AllowEventBridgeInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.ynab_notion_cron.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.lambda_schedule.arn
 } 
