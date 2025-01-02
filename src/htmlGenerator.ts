@@ -103,8 +103,7 @@ export const uploadCategoryVisualizations = async (categories: CategoryData[]): 
             Bucket: BUCKET_NAME,
             Key: fileName,
             Body: html,
-            ContentType: 'text/html',
-            ACL: 'public-read'
+            ContentType: 'text/html'
         })).then(() => {
             const url = `http://${BUCKET_NAME}.s3-website-${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
             console.log(`Successfully uploaded ${fileName}. URL: ${url}`);
