@@ -43,6 +43,7 @@ resource "aws_lambda_function" "ynab_notion_cron" {
   environment {
     variables = {
       YNAB_ACCESS_TOKEN = var.ynab_access_token
+      YNAB_BUDGET_ID    = "778d3042-d921-4b18-a75a-cfe84a632043"
     }
   }
 }
