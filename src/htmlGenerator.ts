@@ -1,7 +1,7 @@
-import { S3 } from 'aws-sdk';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { CategoryData } from './types';
 
-const s3 = new S3();
+const s3Client = new S3Client({});
 const BUCKET_NAME = 'ynab-notion-category-visualizations';
 
 export const generateCategoryHtml = (category: CategoryData): string => {
@@ -92,27 +92,34 @@ export const generateCategoryHtml = (category: CategoryData): string => {
 </html>`;
 };
 
-export const uploadCategoryVisualizations = (categories: CategoryData[]) => {
+export const uploadCategoryVisualizations = async (categories: CategoryData[]): Promise<void> => {
     console.log(`Starting upload of ${categories.length} category visualizations`);
-    const upload = categories.map((category) => {
+    
+    const uploadPromises = categories.map((category) => {
         const html = generateCategoryHtml(category);
         const fileName = `${category.name.toLowerCase().replace(/\s+/g, '-')}.html`;
         console.log(`Uploading visualization for ${category.name} to ${fileName}`);
-
-        try {
-            s3.putObject({
-                Bucket: BUCKET_NAME,
-                Key: fileName,
-                Body: html,
-                ContentType: 'text/html',
-                ACL: 'public-read'
-            });            
+        return s3Client.send(new PutObjectCommand({
+            Bucket: BUCKET_NAME,
+            Key: fileName,
+            Body: html,
+            ContentType: 'text/html',
+            ACL: 'public-read'
+        })).then(() => {
             const url = `http://${BUCKET_NAME}.s3-website-${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
             console.log(`Successfully uploaded ${fileName}. URL: ${url}`);
             return url;
-        } catch (error) {
+        }).catch((error) => {
             console.error(`Failed to upload ${fileName}:`, error);
             throw error;
-        }
+        });
     });
+
+    try {
+        await Promise.all(uploadPromises);
+        console.log('Successfully uploaded all category visualizations');
+    } catch (error) {
+        console.error('Failed to upload some category visualizations:', error);
+        throw error;
+    }
 }; 
