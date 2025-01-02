@@ -39,6 +39,7 @@ resource "aws_lambda_function" "ynab_notion_cron" {
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 
   runtime = "nodejs18.x"
+  timeout = 6
 
   environment {
     variables = {

@@ -5,6 +5,9 @@ const s3 = new S3();
 const BUCKET_NAME = 'ynab-notion-category-visualizations';
 
 export const generateCategoryHtml = (category: CategoryData): string => {
+    console.log(`Generating HTML visualization for category: ${category.name}`);
+    console.log(`Budget stats - Balance: $${category.balance.toFixed(2)}, Budgeted: $${category.budgeted.toFixed(2)}`);
+    
     const ratio = category.balance / category.budgeted;
     const percentage = Math.round(ratio * 100);
     const remainingPercentage = Math.max(0, 100 - percentage);
@@ -89,21 +92,27 @@ export const generateCategoryHtml = (category: CategoryData): string => {
 </html>`;
 };
 
-export const uploadCategoryVisualizations = async (categories: CategoryData[]): Promise<void> => {
-    const uploadPromises = categories.map(async (category) => {
+export const uploadCategoryVisualizations = (categories: CategoryData[]) => {
+    console.log(`Starting upload of ${categories.length} category visualizations`);
+    const upload = categories.map((category) => {
         const html = generateCategoryHtml(category);
         const fileName = `${category.name.toLowerCase().replace(/\s+/g, '-')}.html`;
+        console.log(`Uploading visualization for ${category.name} to ${fileName}`);
 
-        await s3.putObject({
-            Bucket: BUCKET_NAME,
-            Key: fileName,
-            Body: html,
-            ContentType: 'text/html',
-            ACL: 'public-read'
-        }).promise();
-
-        return `http://${BUCKET_NAME}.s3-website-${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+        try {
+            s3.putObject({
+                Bucket: BUCKET_NAME,
+                Key: fileName,
+                Body: html,
+                ContentType: 'text/html',
+                ACL: 'public-read'
+            });            
+            const url = `http://${BUCKET_NAME}.s3-website-${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+            console.log(`Successfully uploaded ${fileName}. URL: ${url}`);
+            return url;
+        } catch (error) {
+            console.error(`Failed to upload ${fileName}:`, error);
+            throw error;
+        }
     });
-
-    await Promise.all(uploadPromises);
 }; 
