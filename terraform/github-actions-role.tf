@@ -190,6 +190,34 @@ data "aws_iam_policy_document" "github_actions_policy" {
       values   = ["Project"]
     }
   }
+
+  # Cost Explorer and Budgets permissions
+  statement {
+    actions = [
+      "budgets:View*",
+      "budgets:Describe*",
+      "ce:Get*",
+      "ce:List*",
+      "ce:Describe*"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    actions = [
+      "budgets:CreateBudget",
+      "budgets:DeleteBudget",
+      "budgets:ModifyBudget",
+      "ce:UpdateCostAllocationTagsStatus",
+      "ce:CreateCostAllocationTag",
+      "ce:DeleteCostAllocationTag",
+      "ce:UpdateCostAllocationTag"
+    ]
+    resources = [
+      aws_budgets_budget.project_budget.arn,
+      "arn:aws:ce::${data.aws_caller_identity.current.account_id}:tag/${aws_ce_cost_allocation_tag.ce_tag.tag_key}"
+    ]
+  }
 }
 
 resource "aws_iam_role_policy" "github_actions" {

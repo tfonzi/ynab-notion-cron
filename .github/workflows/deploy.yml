@@ -21,6 +21,7 @@ jobs:
       TF_VAR_aws_region: us-east-1
       TF_VAR_terraform_state_bucket: ynab-notion-cron-bucket
       TF_VAR_terraform_state_lock_table_arn: arn:aws:dynamodb:us-east-1:611260057175:table/terraform-state-locks
+      TF_VAR_alert_email: "tyler.a.fonzi@gmail.com"
     
     permissions:
       id-token: write

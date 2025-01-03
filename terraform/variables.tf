@@ -18,3 +18,8 @@ variable "terraform_state_lock_table_arn" {
   description = "The ARN of the DynamoDB table used for Terraform state locking"
   type        = string
 }
+
+variable "alert_email" {
+  description = "Email address to receive budget alerts"
+  type        = string
+}
