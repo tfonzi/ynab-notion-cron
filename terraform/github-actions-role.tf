@@ -34,32 +34,40 @@ data "aws_iam_policy_document" "github_actions_policy" {
       "lambda:UpdateAlias",
       "lambda:GetFunctionCodeSigningConfig"
     ]
-    resources = [aws_lambda_function.ynab_notion_cron.arn]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceTag/Project"
+      values   = ["ynab-notion-cron"]
+    }
   }
 
   # IAM permissions for managing roles and policies
   statement {
     actions = [
-      "iam:GetRole",
+      "iam:Get*",
+      "iam:List*"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    actions = [
       "iam:CreateRole",
       "iam:DeleteRole",
       "iam:PutRolePolicy",
       "iam:DeleteRolePolicy",
-      "iam:GetRolePolicy",
-      "iam:ListRolePolicies",
       "iam:AttachRolePolicy",
       "iam:DetachRolePolicy",
-      "iam:ListAttachedRolePolicies",
-      "iam:ListInstanceProfilesForRole",
-      "iam:GetInstanceProfile",
       "iam:RemoveRoleFromInstanceProfile",
-      "iam:DeleteInstanceProfile",
-      "iam:GetOpenIDConnectProvider"
+      "iam:DeleteInstanceProfile"
     ]
-    resources = [
-      aws_iam_role.github_actions.arn,
-      aws_iam_role.lambda_role.arn
-    ]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceTag/Project"
+      values   = ["ynab-notion-cron"]
+    }
   }
 
   # Additional statement for OIDC provider access
