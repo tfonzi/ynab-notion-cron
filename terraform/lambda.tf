@@ -37,6 +37,7 @@ resource "aws_lambda_function" "ynab_notion_cron" {
   role             = aws_iam_role.lambda_role.arn
   handler          = "index.handler"
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  depends_on       = [aws_iam_role.github_actions, aws_iam_role_policy.github_actions]
 
   runtime = "nodejs18.x"
   timeout = 15
@@ -53,12 +54,14 @@ resource "aws_lambda_function" "ynab_notion_cron" {
 resource "aws_cloudwatch_log_group" "lambda_logs" {
   name              = "/aws/lambda/${aws_lambda_function.ynab_notion_cron.function_name}"
   retention_in_days = 14
+  depends_on        = [aws_iam_role.github_actions, aws_iam_role_policy.github_actions]
 }
 
 # S3 access policy for Lambda
 resource "aws_iam_role_policy" "lambda_s3_policy" {
-  name = "lambda_s3_policy"
-  role = aws_iam_role.lambda_role.id
+  name       = "lambda_s3_policy"
+  role       = aws_iam_role.lambda_role.id
+  depends_on = [aws_iam_role.github_actions, aws_iam_role_policy.github_actions]
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -85,13 +88,15 @@ resource "aws_cloudwatch_event_rule" "lambda_schedule" {
   name                = "ynab_notion_cron_schedule"
   description         = "Trigger Lambda function every 3 hours starting at 6am"
   schedule_expression = "cron(0 6/3 * * ? *)" # Run at 6am, 9am, 12pm, 3pm, 6pm, 9pm, 12am, 3am UTC
+  depends_on          = [aws_iam_role.github_actions, aws_iam_role_policy.github_actions]
 }
 
 # EventBridge target to point to the Lambda function
 resource "aws_cloudwatch_event_target" "lambda_target" {
-  rule      = aws_cloudwatch_event_rule.lambda_schedule.name
-  target_id = "YnabNotionCronLambda"
-  arn       = aws_lambda_function.ynab_notion_cron.arn
+  rule       = aws_cloudwatch_event_rule.lambda_schedule.name
+  target_id  = "YnabNotionCronLambda"
+  arn        = aws_lambda_function.ynab_notion_cron.arn
+  depends_on = [aws_iam_role.github_actions, aws_iam_role_policy.github_actions]
 }
 
 # Lambda permission to allow EventBridge to invoke the function
@@ -101,4 +106,5 @@ resource "aws_lambda_permission" "allow_eventbridge" {
   function_name = aws_lambda_function.ynab_notion_cron.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.lambda_schedule.arn
+  depends_on    = [aws_iam_role.github_actions, aws_iam_role_policy.github_actions]
 } 

@@ -164,7 +164,9 @@ data "aws_iam_policy_document" "github_actions_policy" {
       "events:RemoveTargets",
       "events:Describe*",
       "events:List*",
-      "events:Get*"
+      "events:Get*",
+      "events:TagResource",
+      "events:UntagResource"
     ]
     resources = [aws_cloudwatch_event_rule.lambda_schedule.arn]
   }
