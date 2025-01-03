@@ -20,19 +20,25 @@ resource "aws_iam_role" "github_actions" {
 
 data "aws_iam_policy_document" "github_actions_policy" {
   # Lambda permissions
+
   statement {
     actions = [
-      "lambda:GetFunction",
+      "lambda:Get*",
+      "lambda:List*"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    actions = [
       "lambda:CreateFunction",
       "lambda:DeleteFunction",
       "lambda:UpdateFunctionCode",
       "lambda:UpdateFunctionConfiguration",
-      "lambda:ListVersionsByFunction",
       "lambda:PublishVersion",
       "lambda:CreateAlias",
       "lambda:DeleteAlias",
       "lambda:UpdateAlias",
-      "lambda:GetFunctionCodeSigningConfig"
     ]
     resources = ["*"]
     condition {
@@ -164,6 +170,28 @@ data "aws_iam_policy_document" "github_actions_policy" {
     resources = [aws_cloudwatch_event_rule.lambda_schedule.arn]
   }
 }
+# Cost Explorer permissions
+statement {
+  actions = [
+    "ce:List*",
+    "ce:Get*"
+  ]
+  resources = ["*"]
+}
+
+# Cost Allocation Tag permissions
+statement {
+  actions = [
+    "ce:UpdateCostAllocationTagsStatus"
+  ]
+  resources = ["*"]
+  condition {
+    test     = "StringEquals"
+    variable = "ce:tagKey"
+    values   = ["Project"]
+  }
+}
+
 
 resource "aws_iam_role_policy" "github_actions" {
   name   = "github-actions-policy"
