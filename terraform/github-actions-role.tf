@@ -196,6 +196,7 @@ data "aws_iam_policy_document" "github_actions_policy" {
     actions = [
       "budgets:View*",
       "budgets:Describe*",
+      "budgets:List*",
       "ce:Get*",
       "ce:List*",
       "ce:Describe*"
