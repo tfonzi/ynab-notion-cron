@@ -4,14 +4,26 @@ import { CategoryData } from './types';
 const s3Client = new S3Client({});
 const BUCKET_NAME = 'ynab-notion-category-visualizations';
 
+const calculateForecastAngle = (): number => {
+    const now = new Date();
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const currentDay = now.getDate();
+    const percentageOfMonth = currentDay / daysInMonth;
+    return -90 - (percentageOfMonth * 360);
+};
+
 const generateCategoryChart = (category: CategoryData): string => {
     const percentage = Math.round((category.balance / category.budgeted) * 100);
     const remainingPercentage = Math.max(0, 100 - percentage);
+    const forecastAngle = calculateForecastAngle();
 
     return `<div class="chart-wrapper">
             <h3>${category.name}</h3>
             <div class="chart-container">
-                <div class="pie" style="--percentage: ${percentage}%"></div>
+                <div class="pie" style="--percentage: ${percentage}%">
+                    <div class="reference-line"></div>
+                    <div class="forecast-line" style="--forecast-angle: ${forecastAngle}deg"></div>
+                </div>
             </div>
             <div class="legend">
                 <div class="legend-item">
@@ -155,6 +167,30 @@ export const generateDashboardHtml = (categories: CategoryData[]): string => {
             inset: 0;
             border-radius: 50%;
             background: var(--color-danger);
+        }
+
+        .forecast-line {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50%;
+            height: 0;
+            border-top: 1px dashed rgba(0, 0, 0, 0.5);
+            transform-origin: left;
+            transform: rotate(var(--forecast-angle));
+            z-index: 2;
+        }
+
+        .reference-line {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50%;
+            height: 0;
+            border-top: 1px solid rgba(0, 0, 0, 0.5);
+            transform-origin: left;
+            transform: rotate(-90deg);  /* Points straight up */
+            z-index: 2;
         }
 
         .pie::before {
