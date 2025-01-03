@@ -83,8 +83,8 @@ resource "aws_iam_role_policy" "lambda_s3_policy" {
 # EventBridge rule for scheduled Lambda execution
 resource "aws_cloudwatch_event_rule" "lambda_schedule" {
   name                = "ynab_notion_cron_schedule"
-  description         = "Trigger Lambda function every 6 hours starting at 6am"
-  schedule_expression = "cron(0 6/6 * * ? *)" # Run at 6am, 12pm, 6pm, 12am UTC
+  description         = "Trigger Lambda function every 3 hours starting at 6am"
+  schedule_expression = "cron(0 6/3 * * ? *)" # Run at 6am, 9am, 12pm, 3pm, 6pm, 9pm, 12am, 3am UTC
 }
 
 # EventBridge target to point to the Lambda function

@@ -15,12 +15,12 @@ const generateCategoryChart = (category: CategoryData): string => {
             </div>
             <div class="legend">
                 <div class="legend-item">
-                    <div class="color-box balance"></div>
-                    <span>Balance: ${percentage}% ($${category.balance.toFixed(2)})</span>
+                    <div class="color-box remaining"></div>
+                    <span>Remaining: ${percentage}% ($${category.balance.toFixed(2)})</span>
                 </div>
                 <div class="legend-item">
-                    <div class="color-box remaining"></div>
-                    <span>Remaining: ${remainingPercentage}% ($${(category.budgeted - category.balance).toFixed(2)})</span>
+                    <div class="color-box spent"></div>
+                    <span>Spent: ${remainingPercentage}% ($${(category.budgeted - category.balance).toFixed(2)})</span>
                 </div>
             </div>
         </div>`;
@@ -113,15 +113,84 @@ export const generateDashboardHtml = (categories: CategoryData[]): string => {
             width: min(200px, 100%);
             margin: auto;
             aspect-ratio: 1;
+            transition: transform 0.2s ease;
+            cursor: pointer;
+        }
+
+        .chart-container:hover {
+            transform: scale(1.05);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-20px);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .money {
+            position: absolute;
+            color: #85bb65;
+            font-size: 1.2rem;
+            pointer-events: none;
+            z-index: 1;
         }
 
         .pie {
             position: absolute;
             inset: 0;
             border-radius: 50%;
-            background: conic-gradient(
-                var(--color-success) var(--percentage),
-                var(--color-danger) var(--percentage)
+            background: var(--color-danger);
+        }
+
+        .pie::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: var(--color-success);
+            mask: conic-gradient(
+                black var(--percentage),
+                transparent var(--percentage)
+            );
+            -webkit-mask: conic-gradient(
+                black var(--percentage),
+                transparent var(--percentage)
+            );
+        }
+
+        .pie::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: radial-gradient(
+                circle at 30% 30%,
+                rgba(255, 255, 255, 0.2) 0%,
+                rgba(255, 255, 255, 0.05) 30%,
+                transparent 60%
+            );
+            mask: conic-gradient(
+                black var(--percentage),
+                transparent var(--percentage)
+            );
+            -webkit-mask: conic-gradient(
+                black var(--percentage),
+                transparent var(--percentage)
             );
         }
 
@@ -145,8 +214,8 @@ export const generateDashboardHtml = (categories: CategoryData[]): string => {
             flex-shrink: 0;
         }
 
-        .balance { background: var(--color-success); }
-        .remaining { background: var(--color-danger); }
+        .remaining { background: var(--color-success); }
+        .spent { background: var(--color-danger); }
 
         @media (max-width: 600px) {
             .dashboard-grid {
@@ -160,6 +229,37 @@ export const generateDashboardHtml = (categories: CategoryData[]): string => {
             }
         }
     </style>
+    <script>
+        (function() {
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('.chart-container').forEach(function(container) {
+                    container.addEventListener('click', function() {
+                        // Add shake animation
+                        var pie = this.querySelector('.pie');
+                        pie.classList.add('shake');
+                        setTimeout(function() {
+                            pie.classList.remove('shake');
+                        }, 500);
+
+                        // Create falling money
+                        for (var i = 0; i < 8; i++) {
+                            var money = document.createElement('div');
+                            money.textContent = '$';
+                            money.className = 'money';
+                            money.style.left = (Math.random() * 100) + '%';
+                            money.style.animation = 'fall ' + (0.5 + Math.random() * 0.5) + 's ease-in forwards';
+                            container.appendChild(money);
+                            (function(element) {
+                                setTimeout(function() {
+                                    element.remove();
+                                }, 1500);
+                            })(money);
+                        }
+                    });
+                });
+            });
+        })();
+    </script>
 </head>
 <body>
     <h1>YNAB Category Budget Dashboard</h1>
